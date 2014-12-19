@@ -3,7 +3,75 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="base">
+    <resultMap id="BaseResultMap" type="Doctor">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="website" jdbcType="VARCHAR" property="website" />
+        <result column="goodCount" jdbcType="VARCHAR" property="goodCount" />
+        <result column="replyCount" jdbcType="VARCHAR" property="replyCount" />
+        <result column="patientExpCount" jdbcType="VARCHAR" property="patientExpCount" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="blog" jdbcType="VARCHAR" property="blog" />
+    </resultMap>
     <select id="selectDoctorByID" parameterType="int" resultType="Doctor">
         select * from `doctor` where id = #{id}
     </select>
+    <select id="selectAllDoctor" parameterType="int" resultType="Doctor">
+        select * from `doctor`
+    </select>
+    <insert id="insertDoctor" parameterType="Doctor">
+        insert into doctor
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name,
+            </if>
+            <if test="website != null">
+                website,
+            </if>
+            <if test="goodCount != null">
+                goodcount,
+            </if>
+            <if test="replyCount != null">
+                replyCount,
+            </if>
+            <if test="patientExpCount != null">
+                patientExpCount,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="blog != null">
+                blog,
+            </if>
+            <if test="hospital != null">
+                hospital,
+            </if>
+        </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="website != null">
+                #{website,jdbcType=VARCHAR},
+            </if>
+            <if test="goodCount != null">
+                #{goodCount,jdbcType=VARCHAR},
+            </if>
+            <if test="replyCount != null">
+                #{replyCount,jdbcType=VARCHAR},
+            </if>
+            <if test="patientExpCount != null">
+                #{patientExpCount,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="blog != null">
+                #{blog,jdbcType=VARCHAR},
+            </if>
+            <if test="hospital != null">
+                    #{hospital,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
 </mapper>

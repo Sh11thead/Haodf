@@ -59,6 +59,7 @@ public class TestMe {
             if(i==0){
                 praseAndSave(mainPage);
             }else{
+                logger.info("begin to parse info of page {}",i+1);
                 praseAndSave(ClientUtil.getUrlContent("http://www.haodf.com/jibing/yigan/daifu_"+(i+1)+".htm"));
             }
             Thread.sleep(3000);
@@ -89,7 +90,7 @@ public class TestMe {
                 //头衔
                 String pstrtitle = "<span class=\"ml15\">(.+?)</span>";
                 //医院
-                String pstrhos = "</span></p>([\\s\\S]*?)<br>";
+                String pstrhos = "</span></p>([\\s\\S]+?)<br>";
                 //好评数目
                 String pstrgood="患者好评<span class=\"text_u\">(.+?)</span>票";
                 //回复数目
@@ -111,6 +112,7 @@ public class TestMe {
                 doctor.setWebsite(searchAndFind(pstrwebsite,searchHtml));
                 doctor.setBlog(searchAndFind(pstrblog,searchHtml));
                 logger.info(doctor.toString());
+                SimpleDao.getInstance().insert("insertDoctor",doctor);
             }
         }catch (ParserException e) {
             e.printStackTrace();

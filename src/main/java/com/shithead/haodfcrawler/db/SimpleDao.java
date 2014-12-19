@@ -46,6 +46,7 @@ public class SimpleDao {
         SqlSession session = sqlSessionFactory.openSession();
         try{
             session.insert(statement,O);
+            session.commit();
         }catch (Exception e){
             logger.error(e.getMessage());
         }
