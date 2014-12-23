@@ -57,13 +57,15 @@ public class TestMe {
         }
         for(int i=0;i<pageNum;i++){
             if(i==0){
-                praseAndSave(mainPage);
+                parseAndSave(mainPage);
             }else{
                 logger.info("begin to parse info of page {}",i+1);
-                praseAndSave(ClientUtil.getUrlContent("http://www.haodf.com/jibing/yigan/daifu_"+(i+1)+".htm"));
+                parseAndSave(ClientUtil.getUrlContent("http://www.haodf.com/jibing/yigan/daifu_" + (i + 1) + ".htm"));
             }
             Thread.sleep(3000);
         }
+
+    //    parseBlog(ClientUtil.getUrlContent("http://jiangrl.haodf.com/"));
 
     }
     private static String searchAndFind(String pstr,String content){
@@ -76,7 +78,47 @@ public class TestMe {
         }
     }
 
-    private static void praseAndSave(String mainPage){
+    private static void parseBlog(String mainPage){
+        //构造解析器
+        Parser p = Parser.createParser(mainPage,"utf-8");
+        //先抓個人統計信息
+        try{
+            NodeFilter selfCalculateFilter = new CssSelectorNodeFilter("p[class='f18 mr_title']");
+            org.htmlparser.util.NodeList ndlist = p.parse(selfCalculateFilter);
+            if(ndlist!=null && ndlist.size()>0){
+                Node doctorNode = ndlist.elementAt(0);
+                String html = doctorNode.toHtml();
+                String totalView = "li>总 访 问：<span class=\"orange1 pr5\">(.+?)</span>";
+                String thanks = "<li>感 谢 信：<span class=\"orange1 pr5\">(.+?)</span>";
+                String warminggifts = "<li>心意礼物：<span class=\"orange1 pr5\">(.+?)</span>";
+                String votecount = "<li>患者投票：<span class=\"orange1 pr5\">(.+?)</span>票</li>";
+                String totalArticle = "总 文 章：<span class=\"orange1 pr5\">(.+?)</span>篇";
+                logger.info("{}",searchAndFind(totalView,mainPage));
+                logger.info("{}",searchAndFind(thanks,mainPage));
+                logger.info("{}",searchAndFind(warminggifts,mainPage));
+                logger.info("{}",searchAndFind(votecount,mainPage));
+                logger.info("{}",searchAndFind(totalArticle,mainPage));
+            }
+            //解析愛心值貢獻值
+            p.reset();
+            NodeFilter liteFilter = new CssSelectorNodeFilter("ul[class='doc_info_ul1']");
+            ndlist = p.parse(liteFilter);
+            if(ndlist!=null && ndlist.size()>0){
+                Node doctorNode = ndlist.elementAt(0);
+                String html = doctorNode.toHtml();
+                String lovingheart = "爱心值:(.+?)分";
+                String contribute = "href=\"http://www.haodf.com/info/scoreinfo_doctor.php\" >(.+?)</a>";
+                logger.info("{}",searchAndFind(lovingheart,mainPage));
+                logger.info("{}",searchAndFind(contribute,mainPage));
+            }
+        }catch (Exception e){
+
+        }
+
+
+
+    }
+    private static void parseAndSave(String mainPage){
         //构造解析器
         Parser p = Parser.createParser(mainPage,"utf-8");
         NodeFilter doctorsFilter = new CssSelectorNodeFilter("li[class='hp_doc_box']");
@@ -110,7 +152,11 @@ public class TestMe {
                 doctor.setReplyCount(searchAndFind(pstrreply, searchHtml));
                 doctor.setPatientExpCount(searchAndFind(pstrexp,searchHtml));
                 doctor.setWebsite(searchAndFind(pstrwebsite,searchHtml));
-                doctor.setBlog(searchAndFind(pstrblog,searchHtml));
+                String blog = searchAndFind(pstrblog, searchHtml);
+                doctor.setBlog(blog);
+                if(blog!=null && !blog.equals("")){
+                   doctor.setUname(searchAndFind("http://(.+?).haodf.com/",blog));
+                }
                 logger.info(doctor.toString());
                 SimpleDao.getInstance().insert("insertDoctor",doctor);
             }

@@ -12,6 +12,7 @@
         <result column="patientExpCount" jdbcType="VARCHAR" property="patientExpCount" />
         <result column="title" jdbcType="VARCHAR" property="title" />
         <result column="blog" jdbcType="VARCHAR" property="blog" />
+        <result column="uname" jdbcType="VARCHAR" property="uname" />
     </resultMap>
     <select id="selectDoctorByID" parameterType="int" resultType="Doctor">
         select * from `doctor` where id = #{id}
@@ -46,6 +47,9 @@
             <if test="hospital != null">
                 hospital,
             </if>
+            <if test="uname != null">
+                uname,
+            </if>
         </trim>
             <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null">
@@ -71,6 +75,9 @@
             </if>
             <if test="hospital != null">
                     #{hospital,jdbcType=VARCHAR},
+            </if>
+            <if test="uname != null">
+                    #{uname,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

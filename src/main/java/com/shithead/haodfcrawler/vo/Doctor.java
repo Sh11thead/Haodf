@@ -12,6 +12,7 @@ public class Doctor implements Serializable
 {
     private Integer id;
     private String name;
+    private String uname;
     private String website;
     private String goodCount;
     private String replyCount;
