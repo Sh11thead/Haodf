@@ -3,41 +3,15 @@ package com.shithead.haodfcrawl.test;
 import com.shithead.haodfcrawler.db.SimpleDao;
 import com.shithead.haodfcrawler.util.ClientUtil;
 import com.shithead.haodfcrawler.util.HtmlUtils;
+import com.shithead.haodfcrawler.util.RegexUtils;
 import com.shithead.haodfcrawler.vo.Doctor;
-import junit.framework.Test;
-import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
-import org.htmlparser.Tag;
-import org.htmlparser.filters.AndFilter;
 import org.htmlparser.filters.CssSelectorNodeFilter;
-import org.htmlparser.filters.TagNameFilter;
-import org.htmlparser.nodes.TagNode;
-import org.htmlparser.tags.Div;
 import org.htmlparser.util.ParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.NodeList;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by Shulin.kang on 2014/12/15.
@@ -45,7 +19,7 @@ import java.util.regex.Pattern;
 public class TestMe {
     private static final Logger logger = LoggerFactory.getLogger(TestMe.class);
     public  static void main(String[] args) throws InterruptedException {
-        String mainPage = ClientUtil.getUrlContent("http://www.haodf.com/jibing/yigan/daifu.htm");
+/*        String mainPage = ClientUtil.getUrlContent("http://www.haodf.com/jibing/yigan/daifu.htm");
         //构造解析器
         Parser p = Parser.createParser(mainPage,"utf-8");
         // 取得页数
@@ -63,20 +37,12 @@ public class TestMe {
                 parseAndSave(ClientUtil.getUrlContent("http://www.haodf.com/jibing/yigan/daifu_" + (i + 1) + ".htm"));
             }
             Thread.sleep(3000);
-        }
+        }*/
 
-    //    parseBlog(ClientUtil.getUrlContent("http://jiangrl.haodf.com/"));
+        parseBlog(ClientUtil.getUrlContent("http://drxiao.haodf.com/"));
 
     }
-    private static String searchAndFind(String pstr,String content){
-        Pattern pattern = Pattern.compile(pstr);
-        Matcher matcher =pattern.matcher(content);
-        if(matcher.find()){
-            return matcher.group(1).trim();
-        }else{
-            return null;
-        }
-    }
+
 
     private static void parseBlog(String mainPage){
         //构造解析器
@@ -93,11 +59,11 @@ public class TestMe {
                 String warminggifts = "<li>心意礼物：<span class=\"orange1 pr5\">(.+?)</span>";
                 String votecount = "<li>患者投票：<span class=\"orange1 pr5\">(.+?)</span>票</li>";
                 String totalArticle = "总 文 章：<span class=\"orange1 pr5\">(.+?)</span>篇";
-                logger.info("{}",searchAndFind(totalView,mainPage));
-                logger.info("{}",searchAndFind(thanks,mainPage));
-                logger.info("{}",searchAndFind(warminggifts,mainPage));
-                logger.info("{}",searchAndFind(votecount,mainPage));
-                logger.info("{}",searchAndFind(totalArticle,mainPage));
+                logger.info("总 访 问：{}", RegexUtils.searchAndFind(totalView, mainPage));
+                logger.info("感 谢 信：{}",RegexUtils.searchAndFind(thanks, mainPage));
+                logger.info("心意礼物：{}",RegexUtils.searchAndFind(warminggifts, mainPage));
+                logger.info("患者投票：{}",RegexUtils.searchAndFind(votecount, mainPage));
+                logger.info("总 文 章：{}",RegexUtils.searchAndFind(totalArticle, mainPage));
             }
             //解析愛心值貢獻值
             p.reset();
@@ -108,14 +74,68 @@ public class TestMe {
                 String html = doctorNode.toHtml();
                 String lovingheart = "爱心值:(.+?)分";
                 String contribute = "href=\"http://www.haodf.com/info/scoreinfo_doctor.php\" >(.+?)</a>";
-                logger.info("{}",searchAndFind(lovingheart,mainPage));
-                logger.info("{}",searchAndFind(contribute,mainPage));
+                logger.info("爱心值{}",RegexUtils.searchAndFind(lovingheart, mainPage));
+                logger.info("医生贡献值{}",RegexUtils.searchAndFind(contribute, mainPage));
             }
+            //男女？
+            p.reset();
+            liteFilter = new CssSelectorNodeFilter("div[class='fs pr15 pb10 pl15']");
+            ndlist = p.parse(liteFilter);
+            if(ndlist!=null && ndlist.size()>0){
+                Node doctorNode = ndlist.elementAt(0);
+                String html = doctorNode.toHtml();
+                if(html.contains("男")){
+                    logger.info("sex:男");
+                }
+                if(html.contains("女")){
+                    logger.info("sex:女");
+                }
+            }
+
+            //医生教育水平
+            p.reset();
+            liteFilter = new CssSelectorNodeFilter("h3[class='doc_name f22 fl']");
+            ndlist = p.parse(liteFilter);
+            if(ndlist!=null && ndlist.size()>0){
+                String nameAndtitleAndEducation = ndlist.elementAt(0).toPlainTextString();
+                if(nameAndtitleAndEducation.contains("&nbsp;&nbsp;")){
+                    int firstindex = nameAndtitleAndEducation.indexOf("&nbsp;&nbsp;");
+                    if(firstindex!=-1){
+                        String name = nameAndtitleAndEducation.substring(0,firstindex);
+                        logger.info("name:{}",name);
+                        String titleAndEdu = nameAndtitleAndEducation.substring(firstindex+12);
+                        if(titleAndEdu.contains(" ")){
+                            String[] strarray = titleAndEdu.split(" ");
+                            String title = strarray[0];
+                            logger.info("title:{}",title);
+                            if(strarray.length>1){
+                                String edu = strarray[1];
+                                logger.info("edu:{}",edu);
+                            }
+                        }
+                        else {
+                            logger.info("title:{}",titleAndEdu);
+                        }
+                    }
+
+                }else {
+                    logger.info("name:{}",nameAndtitleAndEducation);
+                }
+            }
+            //医院名称以及医院详情地址
+            p.reset();
+            liteFilter = new CssSelectorNodeFilter("div[class='doc_hospital']");
+            ndlist = p.parse(liteFilter);
+            if(ndlist!=null && ndlist.size()>0){
+                String html = ndlist.elementAt(0).toHtml();
+                String hosname = RegexUtils.searchAndFind("<p><a href=\"(.*?)\" target=\"_blank\">(.*?)</a>",html,2);
+                String hoswebsite = RegexUtils.searchAndFind("<p><a href=\"(.*?)\" target=\"_blank\">(.*?)</a>",html,1);
+                logger.info("hosname:{},hoswebsite:{}",hosname,hoswebsite);
+            }
+
         }catch (Exception e){
-
+            e.printStackTrace();
         }
-
-
 
     }
     private static void parseAndSave(String mainPage){
@@ -145,17 +165,17 @@ public class TestMe {
                 String pstrblog = "href=\"(.+?)\" class=\"home_btn\">个人网站";
 
                 Doctor doctor = new Doctor();
-                doctor.setName(searchAndFind(pstrname, searchHtml));
-                doctor.setHospital(HtmlUtils.toText(searchAndFind(pstrhos, searchHtml)));
-                doctor.setTitle(searchAndFind(pstrtitle, searchHtml));
-                doctor.setGoodCount(searchAndFind(pstrgood, searchHtml));
-                doctor.setReplyCount(searchAndFind(pstrreply, searchHtml));
-                doctor.setPatientExpCount(searchAndFind(pstrexp,searchHtml));
-                doctor.setWebsite(searchAndFind(pstrwebsite,searchHtml));
-                String blog = searchAndFind(pstrblog, searchHtml);
+                doctor.setName(RegexUtils.searchAndFind(pstrname, searchHtml));
+                doctor.setHospital(HtmlUtils.toText(RegexUtils.searchAndFind(pstrhos, searchHtml)));
+                doctor.setTitle(RegexUtils.searchAndFind(pstrtitle, searchHtml));
+                doctor.setGoodCount(RegexUtils.searchAndFind(pstrgood, searchHtml));
+                doctor.setReplyCount(RegexUtils.searchAndFind(pstrreply, searchHtml));
+                doctor.setPatientExpCount(RegexUtils.searchAndFind(pstrexp, searchHtml));
+                doctor.setWebsite(RegexUtils.searchAndFind(pstrwebsite, searchHtml));
+                String blog = RegexUtils.searchAndFind(pstrblog, searchHtml);
                 doctor.setBlog(blog);
                 if(blog!=null && !blog.equals("")){
-                   doctor.setUname(searchAndFind("http://(.+?).haodf.com/",blog));
+                   doctor.setUname(RegexUtils.searchAndFind("http://(.+?).haodf.com/", blog));
                 }
                 logger.info(doctor.toString());
                 SimpleDao.getInstance().insert("insertDoctor",doctor);
