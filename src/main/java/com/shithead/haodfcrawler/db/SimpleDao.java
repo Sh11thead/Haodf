@@ -1,5 +1,6 @@
 package com.shithead.haodfcrawler.db;
 
+import com.shithead.haodfcrawler.vo.Doctor;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Reader;
+import java.util.List;
 
 /**
  * Created by Shulin.kang on 2014/12/15.
@@ -30,6 +32,19 @@ public class SimpleDao {
     public static SimpleDao getInstance(){
         return  simpleDao;
     }
+    public List<Doctor> selectDoctorByKind(Doctor doctor){
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            return session.selectList("selectValidDoctorByCondition",doctor);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return  null;
+        }
+        finally {
+            session.close();
+        }
+    }
+
     public Object select(String statement,Object O){
         SqlSession session = sqlSessionFactory.openSession();
         try{

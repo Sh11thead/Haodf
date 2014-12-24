@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="base">
+        <insert id="insertPaymentData" parameterType="PaymentData" >
+                insert into paymentdata
+                <trim prefix="(" suffix=")" suffixOverrides="," >
+                        <if test="id != null" >
+                                id,
+                        </if>
+                        <if test="uname != null" >
+                                uname,
+                        </if>
+                        <if test="actioncode != null" >
+                                actioncode,
+                        </if>
+                        <if test="payments != null" >
+                                payments,
+                        </if>
+                        <if test="groupnum != null" >
+                                groupnum,
+                        </if>
+                        <if test="peoplenum != null" >
+                                peoplenum,
+                        </if>
+                        <if test="topicnum != null" >
+                                topicnum,
+                        </if>
+                </trim>
+                <trim prefix="values (" suffix=")" suffixOverrides="," >
+                        <if test="id != null" >
+                                #{id,jdbcType=INTEGER},
+                        </if>
+                        <if test="uname != null" >
+                                #{uname,jdbcType=VARCHAR},
+                        </if>
+                        <if test="actioncode != null" >
+                                #{actioncode,jdbcType=VARCHAR},
+                        </if>
+                        <if test="payments != null" >
+                                #{payments,jdbcType=VARCHAR},
+                        </if>
+                        <if test="groupnum != null" >
+                                #{groupnum,jdbcType=VARCHAR},
+                        </if>
+                        <if test="peoplenum != null" >
+                                #{peoplenum,jdbcType=VARCHAR},
+                        </if>
+                        <if test="topicnum != null" >
+                                #{topicnum,jdbcType=VARCHAR},
+                        </if>
+                </trim>
+        </insert>
+        <insert id="insertDoctorData" parameterType="DoctorData" >
+                insert into doctordata
+                <trim prefix="(" suffix=")" suffixOverrides="," >
+                        <if test="id != null" >
+                                id,
+                        </if>
+                        <if test="uname != null" >
+                                uname,
+                        </if>
+                        <if test="actioncode != null" >
+                                actioncode,
+                        </if>
+                        <if test="totalview != null" >
+                                totalview,
+                        </if>
+                        <if test="thanks != null" >
+                                thanks,
+                        </if>
+                        <if test="warminggifts != null" >
+                                warminggifts,
+                        </if>
+                        <if test="votecount != null" >
+                                votecount,
+                        </if>
+                        <if test="totalarticle != null" >
+                                totalarticle,
+                        </if>
+                        <if test="lovingheart != null" >
+                                lovingheart,
+                        </if>
+                        <if test="contribute != null" >
+                                contribute,
+                        </if>
+                </trim>
+                <trim prefix="values (" suffix=")" suffixOverrides="," >
+                        <if test="id != null" >
+                                #{id,jdbcType=INTEGER},
+                        </if>
+                        <if test="uname != null" >
+                                #{uname,jdbcType=VARCHAR},
+                        </if>
+                        <if test="actioncode != null" >
+                                #{actioncode,jdbcType=VARCHAR},
+                        </if>
+                        <if test="totalview != null" >
+                                #{totalview,jdbcType=VARCHAR},
+                        </if>
+                        <if test="thanks != null" >
+                                #{thanks,jdbcType=VARCHAR},
+                        </if>
+                        <if test="warminggifts != null" >
+                                #{warminggifts,jdbcType=VARCHAR},
+                        </if>
+                        <if test="votecount != null" >
+                                #{votecount,jdbcType=VARCHAR},
+                        </if>
+                        <if test="totalarticle != null" >
+                                #{totalarticle,jdbcType=VARCHAR},
+                        </if>
+                        <if test="lovingheart != null" >
+                                #{lovingheart,jdbcType=VARCHAR},
+                        </if>
+                        <if test="contribute != null" >
+                                #{contribute,jdbcType=VARCHAR},
+                        </if>
+                </trim>
+        </insert>
+
+        <insert id="insertServiceData" parameterType="ServiceData" >
+                insert into servicedata
+                <trim prefix="(" suffix=")" suffixOverrides="," >
+                        <if test="id != null" >
+                                id,
+                        </if>
+                        <if test="uname != null" >
+                                uname,
+                        </if>
+                        <if test="actioncode != null" >
+                                actioncode,
+                        </if>
+                        <if test="allpatients != null" >
+                                allpatients,
+                        </if>
+                        <if test="allres != null" >
+                                allres,
+                        </if>
+                        <if test="allques != null" >
+                                allques,
+                        </if>
+                </trim>
+                <trim prefix="values (" suffix=")" suffixOverrides="," >
+                        <if test="id != null" >
+                                #{id,jdbcType=INTEGER},
+                        </if>
+                        <if test="uname != null" >
+                                #{uname,jdbcType=VARCHAR},
+                        </if>
+                        <if test="actioncode != null" >
+                                #{actioncode,jdbcType=VARCHAR},
+                        </if>
+                        <if test="allpatients != null" >
+                                #{allpatients,jdbcType=VARCHAR},
+                        </if>
+                        <if test="allres != null" >
+                                #{allres,jdbcType=VARCHAR},
+                        </if>
+                        <if test="allques != null" >
+                                #{allques,jdbcType=VARCHAR},
+                        </if>
+                </trim>
+        </insert>
+</mapper>

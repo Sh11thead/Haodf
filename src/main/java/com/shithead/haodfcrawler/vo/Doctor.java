@@ -20,4 +20,5 @@ public class Doctor implements Serializable
     private String title;
     private String hospital;
     private String blog;
+    private String disease;
 }

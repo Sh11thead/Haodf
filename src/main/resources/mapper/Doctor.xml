@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="base">
-    <resultMap id="BaseResultMap" type="Doctor">
+    <resultMap id="DoctorMap" type="Doctor">
         <id column="id" jdbcType="INTEGER" property="id" />
         <result column="name" jdbcType="VARCHAR" property="name" />
         <result column="website" jdbcType="VARCHAR" property="website" />
@@ -13,12 +13,19 @@
         <result column="title" jdbcType="VARCHAR" property="title" />
         <result column="blog" jdbcType="VARCHAR" property="blog" />
         <result column="uname" jdbcType="VARCHAR" property="uname" />
+        <result column="disease" jdbcType="VARCHAR" property="disease" />
     </resultMap>
     <select id="selectDoctorByID" parameterType="int" resultType="Doctor">
         select * from `doctor` where id = #{id}
     </select>
     <select id="selectAllDoctor" parameterType="int" resultType="Doctor">
         select * from `doctor`
+    </select>
+    <select id="selectValidDoctorByCondition" parameterType="Doctor" resultType="Doctor">
+        SELECT id,uname FROM doctor WHERE uname IS NOT NULL
+        <if test="disease != null">
+            AND disease = #{disease,jdbcType=VARCHAR}
+        </if>
     </select>
     <insert id="insertDoctor" parameterType="Doctor">
         insert into doctor
@@ -50,6 +57,9 @@
             <if test="uname != null">
                 uname,
             </if>
+                <if test="disease != null">
+                    disease,
+                </if>
         </trim>
             <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null">
@@ -78,6 +88,9 @@
             </if>
             <if test="uname != null">
                     #{uname,jdbcType=VARCHAR},
+            </if>
+            <if test="disease != null">
+                #{disease,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

@@ -4,6 +4,11 @@
 <configuration>
     <typeAliases>
         <typeAlias alias="Doctor" type="com.shithead.haodfcrawler.vo.Doctor"/>
+        <typeAlias alias="DoctorInfo" type="com.shithead.haodfcrawler.vo.DoctorInfo"/>
+        <typeAlias alias="HospitalInfo" type="com.shithead.haodfcrawler.vo.HospitalInfo"/>
+        <typeAlias alias="DoctorData" type="com.shithead.haodfcrawler.vo.DoctorData"/>
+        <typeAlias alias="PaymentData" type="com.shithead.haodfcrawler.vo.PaymentData"/>
+        <typeAlias alias="ServiceData" type="com.shithead.haodfcrawler.vo.ServiceData"/>
     </typeAliases>
 
     <environments default="development">
@@ -20,5 +25,7 @@
 
     <mappers>
         <mapper resource="mapper/Doctor.xml"/>
+        <mapper resource="mapper/DoctorInfo.xml"/>
+        <mapper resource="mapper/Data.xml"/>
     </mappers>
 </configuration>
