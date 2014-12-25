@@ -178,13 +178,18 @@ public class InitData {
             Integer pageNo = 1;
             String pageNos = RegexUtils.searchAndFind("共&nbsp;(.+?)&nbsp;页",mainPage);
             try {
-                pageNo = Integer.parseInt(pageNos);
+                if(pageNos==null||"".equals(pageNos)){
+                    pageNo =1;
+                }
+                else{
+                    pageNo = Integer.parseInt(pageNos);
+                }
             }catch (Exception e){
                 logger.error("error pageNo:{}",pageNos);
             }
             logger.info("pageNo:{}",pageNo);
-            //限制爲10頁
-            if(pageNo>0) pageNo =10;
+/*            //限制爲10頁
+            if(pageNo>0) pageNo =10;*/
             Integer allQues = 0;
             Integer allRes = 0;
             for(int i=1;i<=pageNo;i++){
@@ -221,7 +226,6 @@ public class InitData {
                         }
                     }
                 }
-                Thread.sleep(300);
             }
             logger.info("allQues:{},allRespon:{}",allQues,allRes);
             if(allQues!=null)serviceData.setAllques(allQues.toString());
