@@ -3,6 +3,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="base">
+    <select id="selectHospitalInfo" parameterType="java.lang.String" resultType="Hospitalinfo">
+        SELECT * FROM hospitalinfo where hospitalName = #{name}
+    </select>
+    <select id="selectDoctorInfo" parameterType="java.lang.String" resultType="DoctorInfo">
+        SELECT * FROM doctorinfo where uname = #{name}
+    </select>
+
     <insert id="insertHospitalinfo" parameterType="Hospitalinfo" >
         insert into hospitalinfo
         <trim prefix="(" suffix=")" suffixOverrides="," >

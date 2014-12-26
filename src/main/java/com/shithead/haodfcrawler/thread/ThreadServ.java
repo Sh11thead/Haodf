@@ -17,7 +17,7 @@ public class ThreadServ {
         return threadServ;
     }
     private ThreadServ(){
-        this.es = Executors.newFixedThreadPool(100);
+        this.es = Executors.newFixedThreadPool(20);
         this.completionService = new ExecutorCompletionService<String>(es);
     }
 

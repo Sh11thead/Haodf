@@ -2,9 +2,11 @@ package com.shithead.haodfcrawler.exe;
 
 import com.shithead.haodfcrawler.db.SimpleDao;
 import com.shithead.haodfcrawler.vo.Doctor;
+import jxl.write.WriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,11 +17,11 @@ import java.util.List;
 public class Crawl {
     private static final Logger logger = LoggerFactory.getLogger(Crawl.class);
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException, WriteException {
         String code = null;
         if(args.length!=1){
             Date d = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             code =sdf.format(d);
         }
         else{
@@ -35,5 +37,8 @@ public class Crawl {
             logger.info("正在收集第:{}个医生的患者服务区信息",i+1);
             InitData.parseZixun(d.getUname(),code);
         }
+        Excel.andSend(code);
+        logger.info("出来了吗 ");
+        System.exit(0);
     }
 }

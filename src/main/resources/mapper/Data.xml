@@ -3,6 +3,36 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="base">
+        <select id="selectPaymentData" parameterType="java.util.Map" resultType="PaymentData">
+                select * from paymentdata where 1=1
+                <if test="actioncode != null" >
+                        AND actioncode=#{actioncode,jdbcType=VARCHAR}
+                </if>
+                <if test="uname != null" >
+                        AND uname=#{uname,jdbcType=VARCHAR}
+                </if>
+                LIMIT 1
+        </select>
+        <select id="selectDoctorData" parameterType="java.util.Map" resultType="DoctorData">
+                select * from doctordata where 1=1
+                <if test="actioncode != null" >
+                        AND actioncode=#{actioncode,jdbcType=VARCHAR}
+                </if>
+                <if test="uname != null" >
+                        AND  uname=#{uname,jdbcType=VARCHAR}
+                </if>
+                LIMIT 1
+        </select>
+        <select id="selectServiceData" parameterType="java.util.Map" resultType="ServiceData">
+                select * from servicedata where 1=1
+                <if test="actioncode != null" >
+                        AND actioncode=#{actioncode,jdbcType=VARCHAR}
+                </if>
+                <if test="uname != null" >
+                        AND uname=#{uname,jdbcType=VARCHAR}
+                </if>
+                LIMIT 1
+        </select>
         <insert id="insertPaymentData" parameterType="PaymentData" >
                 insert into paymentdata
                 <trim prefix="(" suffix=")" suffixOverrides="," >

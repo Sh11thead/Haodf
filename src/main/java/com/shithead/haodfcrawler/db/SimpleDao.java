@@ -57,6 +57,18 @@ public class SimpleDao {
             session.close();
         }
     }
+    public List selectList(String statement,Object O){
+        SqlSession session = sqlSessionFactory.openSession();
+        try{
+            return session.selectList(statement,O);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return  null;
+        }
+        finally {
+            session.close();
+        }
+    }
     public void insert(String statement,Object O){
         SqlSession session = sqlSessionFactory.openSession();
         try{
