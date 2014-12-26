@@ -1,6 +1,8 @@
 package com.shithead.haodfcrawler.exe;
 
 import com.shithead.haodfcrawler.db.SimpleDao;
+import com.shithead.haodfcrawler.thread.ThreadServ;
+import com.shithead.haodfcrawler.thread.task.HyhTask;
 import com.shithead.haodfcrawler.util.CityUtils;
 import com.shithead.haodfcrawler.util.ClientUtil;
 import com.shithead.haodfcrawler.util.HtmlUtils;
@@ -17,6 +19,7 @@ import org.htmlparser.util.ParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -157,7 +160,7 @@ public class InitData {
         return null;
     }
 
-    public  static void parseZixun(String doctname,String acitoncode){
+    /*public  static void parseZixun(String doctname,String acitoncode){
         ServiceData serviceData = new ServiceData();
         serviceData.setUname(doctname);
         serviceData.setActioncode(acitoncode);
@@ -188,8 +191,8 @@ public class InitData {
                 logger.error("error pageNo:{}",pageNos);
             }
             logger.info("pageNo:{}",pageNo);
-/*            //限制爲10頁
-            if(pageNo>0) pageNo =10;*/
+*//*            //限制爲10頁
+            if(pageNo>0) pageNo =10;*//*
             Integer allQues = 0;
             Integer allRes = 0;
             for(int i=1;i<=pageNo;i++){
@@ -199,7 +202,7 @@ public class InitData {
                 }else{
                     mainPagenext = ClientUtil.getUrlContent("http://"+doctname+".haodf.com/zixun/list.htm?type=&p="+pageNo);
                 }
-                Parser listp = Parser.createParser(mainPage,"utf-8");
+                Parser listp = Parser.createParser(mainPagenext,"utf-8");
                 NodeFilter filterlist = new CssSelectorNodeFilter("table[width='100%']");
                 String listhtml =  listp.parse(filterlist).toHtml();
                 listp = Parser.createParser(listhtml,"utf-8");
@@ -218,14 +221,74 @@ public class InitData {
                     if(yihuanarray.length==2){
                         String yi = yihuanarray[0];
                         String huan = yihuanarray[1];
-                        try{
-                            allRes += Integer.valueOf(yi);
-                            allQues +=Integer.valueOf(huan);
-                        }catch(Exception e){
-                            logger.info("醫患纍加錯誤!!");
-                        }
+                            try{
+                                allRes += Integer.valueOf(yi);
+                                allQues +=Integer.valueOf(huan);
+                            }catch(Exception e){
+                                logger.info("醫患纍加錯誤!!");
+                            }
                     }
                 }
+            }
+            logger.info("allQues:{},allRespon:{}",allQues,allRes);
+            if(allQues!=null)serviceData.setAllques(allQues.toString());
+            if(allRes!=null)serviceData.setAllres(allRes.toString());
+            SimpleDao.getInstance().insert("insertServiceData",serviceData);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }*/
+    public  static void parseZixun(String doctname,String acitoncode){
+        ServiceData serviceData = new ServiceData();
+        serviceData.setUname(doctname);
+        serviceData.setActioncode(acitoncode);
+
+        String mainPage = ClientUtil.getUrlContent("http://" + doctname + ".haodf.com/zixun/list.htm");
+        try{
+            //解析第一頁的信息先
+            Parser p = Parser.createParser(mainPage,"utf-8");
+            NodeFilter nodeFilter = new CssSelectorNodeFilter("p[class='fl pt10']");
+            org.htmlparser.util.NodeList ndlist = p.parse(nodeFilter);
+            if(ndlist!=null && ndlist.size()>0){
+                Node doctorNode = ndlist.elementAt(0);
+                String html = doctorNode.toHtml();
+                String allPatients = RegexUtils.searchAndFind("<span class=\"f14 orange1\">(.+?)</span>", html);
+                if(allPatients==null){
+                    allPatients = RegexUtils.searchAndFind("class=\"pl5 gray2\">\\((.+?)\\)</span", html);
+                }
+                logger.info("allPatients:{}",allPatients);
+                serviceData.setAllpatients(allPatients);
+            }
+            Integer pageNo = 1;
+            String pageNos = RegexUtils.searchAndFind("共&nbsp;(.+?)&nbsp;页",mainPage);
+            try {
+                if(pageNos==null||"".equals(pageNos)){
+                    pageNo =1;
+                }
+                else{
+                    pageNo = Integer.parseInt(pageNos);
+                }
+            }catch (Exception e){
+                logger.error("error pageNo:{}",pageNos);
+            }
+            logger.info("pageNo:{}",pageNo);
+/*            //限制爲10頁
+            if(pageNo>0) pageNo =10;*/
+            Integer allQues = 0;
+            Integer allRes = 0;
+            HyhTask.origin = mainPage;
+            List<HyhTask> hyhTaskListli  =new ArrayList<HyhTask>();
+            for(int i=1;i<=pageNo;i++){
+                HyhTask task = new HyhTask();
+                task.setName(doctname);
+                task.setPageNo(i);
+                hyhTaskListli.add(task);
+            }
+            List<Integer> resli = ThreadServ.getInstance().runAndgetConsult(hyhTaskListli);
+            if(resli!=null&&resli.size()==2){
+                allRes = resli.get(0);
+                allQues =resli.get(1);
             }
             logger.info("allQues:{},allRespon:{}",allQues,allRes);
             if(allQues!=null)serviceData.setAllques(allQues.toString());
