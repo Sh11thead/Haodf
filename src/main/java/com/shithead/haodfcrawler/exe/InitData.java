@@ -8,6 +8,7 @@ import com.shithead.haodfcrawler.util.ClientUtil;
 import com.shithead.haodfcrawler.util.HtmlUtils;
 import com.shithead.haodfcrawler.util.RegexUtils;
 import com.shithead.haodfcrawler.vo.*;
+import org.apache.commons.lang.StringUtils;
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
@@ -19,7 +20,9 @@ import org.htmlparser.util.ParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -158,6 +161,43 @@ public class InitData {
 
         }catch (Exception e){e.printStackTrace();}
         return null;
+    }
+
+
+    public static void parseTime(String dname){
+        //begin
+        String mainPage = ClientUtil.getUrlContent("http://"+dname+".haodf.com");
+        //构造解析器
+        Parser p = Parser.createParser(mainPage, "utf-8");
+        NodeFilter liteFilter;
+        org.htmlparser.util.NodeList ndlist;
+        try{
+            //解析愛心值貢獻值
+            p.reset();
+            liteFilter = new CssSelectorNodeFilter("ul[class='doc_info_ul1']");
+            ndlist = p.parse(liteFilter);
+            if(ndlist!=null && ndlist.size()>0){
+                Node doctorNode = ndlist.elementAt(0);
+                String html = doctorNode.toHtml();
+                String datetime = "开通时间：<span class=\"orange1 pr5\">(.+?)</span>";
+                String gotdate = RegexUtils.searchAndFind(datetime,mainPage);
+                logger.info("开通时间(文本):{}",gotdate);
+                if(StringUtils.isNotBlank(gotdate)){
+                    Date d;
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                    d= sdf.parse(gotdate);
+                    logger.info("开通时间(转换):{}",d);
+                    DoctorDate dd = new DoctorDate();
+                    dd.setUname(dname);
+                    dd.setDate(d);
+                    SimpleDao.getInstance().insert("insertDoctorDate",dd);
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /*public  static void parseZixun(String doctname,String acitoncode){

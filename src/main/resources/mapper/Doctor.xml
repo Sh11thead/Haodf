@@ -15,18 +15,32 @@
         <result column="uname" jdbcType="VARCHAR" property="uname" />
         <result column="disease" jdbcType="VARCHAR" property="disease" />
     </resultMap>
+
+    <resultMap id="DoctorDateMap" type="DoctorDate">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="uname" jdbcType="VARCHAR" property="uname" />
+        <result column="join_time" jdbcType="TIMESTAMP" property="date" />
+
+
+    </resultMap>
     <select id="selectDoctorByID" parameterType="int" resultType="Doctor">
         select * from `doctor` where id = #{id}
+    </select>
+    <select id="selectDoctorDateByUname" parameterType="java.lang.String" resultMap="DoctorDateMap">
+        select * from `doctortime` where uname = #{uname} limit 1
     </select>
     <select id="selectAllDoctor" parameterType="int" resultType="Doctor">
         select * from `doctor`
     </select>
     <select id="selectValidDoctorByCondition" parameterType="Doctor" resultType="Doctor">
-        SELECT id,uname FROM doctor WHERE uname IS NOT NULL
+        SELECT id,uname,name FROM doctor WHERE uname IS NOT NULL
         <if test="disease != null">
             AND disease = #{disease,jdbcType=VARCHAR}
         </if>
     </select>
+    <insert id="insertDoctorDate" parameterType="DoctorDate">
+        INSERT INTO doctortime (uname,join_time) VALUES ( #{uname,jdbcType=VARCHAR},#{date,jdbcType=TIMESTAMP})
+    </insert>
     <insert id="insertDoctor" parameterType="Doctor">
         insert into doctor
             <trim prefix="(" suffix=")" suffixOverrides=",">
